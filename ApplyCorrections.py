@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 import ROOT
-import os, ConfigParser, warnings
+import os, ConfigParser, warnings, sys
 from array import array
 from multiprocessing import Process, Queue
 from optparse import OptionParser
@@ -47,6 +47,7 @@ OutputRecoilPtUpName  = config.get('OutputBranches','OutputRecoilPtUpName')
 OutputPerpDownName      = config.get('OutputBranches','OutputPerpDownName')
 OutputParaDownName      = config.get('OutputBranches','OutputParaDownName')
 OutputRecoilPtDownName  = config.get('OutputBranches','OutputRecoilPtDownName')
+reportFreq  = int(config.get('Misc','ReportFrequency'))
 
 if config.has_option('InputExpressions','MacrosToLoad'):
     macros = (config.get('InputExpressions','MacrosToLoad')).strip(' ').split(',')
@@ -79,6 +80,7 @@ def ApplyCorrection(inQueue):
     smearingCorrections = ROOT.TFile("SmearingFits.root")
     rc = ROOT.RecoilCorrector()
     rc.SetInputName("Zmm")
+    rc.LoadAllFits(smearingCorrections)
     while running:
         try:
             inFileName = inQueue.get(True,2)
@@ -165,8 +167,9 @@ def ApplyCorrection(inQueue):
 
             numEntries = inTree.GetEntriesFast()
             for entry in range(numEntries):
-                if entry % 10000 == 0:
+                if entry % reportFreq == 0:
                     print "Processing " + inFileName + " ... " + str(float(entry)/numEntries * 100) + "%"
+                    print sys.getsizeof(rc)
                 ##
                 inTree.GetEntry(entry)
 
@@ -219,7 +222,6 @@ def ApplyCorrection(inQueue):
                                 rc.SetOutput(rc.kWmn)
                             ##
                         ##
-                        rc.LoadAllFits(smearingCorrections)
                     ##
                     rc.ComputeU(genBosPt,uPerp,uPara)
                     rc.ComputeU(genBosPt,uPerpUp,uParaUp,1.0)
