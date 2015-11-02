@@ -68,6 +68,23 @@ def ApplyCorrection(inQueue):
                 outFile = ROOT.TFile(outDir + "/" + inFileName,"RECREATE")
             ##
             inTree  = inFile.Get(inTreeName)
+            if inTree == None:
+                print ""
+                print "###############################################################"
+                print "##"
+                print "##   InTree not successfully fetched in " + inFileName + "!"
+                print "##   Check config file for tree name."
+                print "##"
+                print "##   Aborting..."
+                print "##"
+                print "###############################################################"
+                print ""
+                outFile.Close()
+                if inFile.IsOpen():
+                    inFile.Close()
+                ##
+                exit(1)
+            ##
             outTree = 0
             if outTreeName == inTreeName and outFile == inFile:
                 outTree = inTree
@@ -100,7 +117,11 @@ def ApplyCorrection(inQueue):
 
             lastPdgId = 0
 
-            for entry in range(inTree.GetEntriesFast()):
+            numEntries = inTree.GetEntriesFast()
+            for entry in range(numEntries):
+                if entry % 100000 == 0:
+                    print "Processing " + inFileName + "... " + str(float(entry)/numEntries * 100) + "%"
+                ##
                 inTree.GetEntry(entry)
 
                 photonPt = photonPtF.EvalInstance()
@@ -126,12 +147,14 @@ def ApplyCorrection(inQueue):
                     if genBosPdgId != lastPdgId:
                         lastPdgId = genBosPdgId
                         if genBosPdg == 22:
-                            rc.SetOutputName("GJets")
+                            rc.SetOutputName("gjets")
                         elif genBosPdg == 23:
                             if abs(daughterPdgId) == 11:
                                 rc.SetOutputName("Zee")
+                            elif abs(daughterPdgId == 13):
+                                rc.SetOutputName("Zmm")
                             else:
-                                rc.SetOutputName("Zee")
+                                rc.SetOutputName("Znn")
                             ##
                         else:
                             if abs(daughterPdgId) == 11:
@@ -147,7 +170,7 @@ def ApplyCorrection(inQueue):
                 else:
                     uPerp[0] = 300
                     uPara[0] = 300
-                    uMag[0]  = -5   ## I'd recommend cutting on this one
+                    uMag[0]  = -5
                 ##
                 uPerpBr.Fill()
                 uParaBr.Fill()
