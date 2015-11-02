@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 import ROOT
-import os, ConfigParser, warnings
+import os, ConfigParser, warnings, sys
 from array import array
 from multiprocessing import Process, Queue
 from optparse import OptionParser
@@ -80,6 +80,7 @@ def ApplyCorrection(inQueue):
     smearingCorrections = ROOT.TFile("SmearingFits.root")
     rc = ROOT.RecoilCorrector()
     rc.SetInputName("Zmm")
+    rc.LoadAllFits(smearingCorrections)
     while running:
         try:
             inFileName = inQueue.get(True,2)
@@ -204,23 +205,22 @@ def ApplyCorrection(inQueue):
                     if genBosPdgId != lastPdgId:
                         lastPdgId = genBosPdgId
                         if genBosPdgId == 22:
-                            rc.SetOutputName("gjets")
+                            rc.SetOutput(rc.kGJets)
                         elif genBosPdgId == 23:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Zee")
+                                rc.SetOutput(rc.kZee)
                             elif abs(daughterPdgId == 13):
-                                rc.SetOutputName("Zmm")
+                                rc.SetOutput(rc.kZmm)
                             else:
-                                rc.SetOutputName("Znn")
+                                rc.SetOutput(rc.kZnn)
                             ##
                         else:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Wen")
+                                rc.SetOutput(rc.kWen)
                             else:
-                                rc.SetOutputName("Wmn")
+                                rc.SetOutput(rc.kWmn)
                             ##
                         ##
-                        rc.LoadAllFits(smearingCorrections)
                     ##
                     rc.ComputeU(genBosPt,uPerp,uPara)
                     rc.ComputeU(genBosPt,uPerpUp,uParaUp,1.0)

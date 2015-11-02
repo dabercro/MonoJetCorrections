@@ -41,6 +41,15 @@ public:
     kU2
   };
 
+  enum ChannelNum {
+    kZmm = 0,
+    kZee,
+    kZnn,
+    kGJets,
+    kWmn,
+    kWen
+  };
+
   enum Parameter {
     kMu,
     kSigma1,
@@ -52,15 +61,17 @@ public:
   // initialize
   void SetCorrectionType(CorrectionType k)  { fCorrectionType = k; }
   void SetInputName(const char *s)          { inName = s;          }
-  void SetOutputName(const char *s)         { outName = s;         } 
+  /* void SetOutputName(const char *s)         { outName = s;         }  */
   void SetSeed(unsigned int u)              { rng->SetSeed(u);     }
 
+  void SetOutput(ChannelNum c)              { fCurrChannel = c;    }
+
   // read inputs
-  void SetFitResult(TF1*,TMatrixDSym*,RecoilType,UType,Parameter);
+  void SetFitResult(TF1*,TMatrixDSym*,RecoilType,UType,Parameter,ChannelNum);
   void LoadAllFits(TFile*);
 
   // computations
-  double GetError(double,RecoilType,UType,Parameter) const;
+  double GetError(double,RecoilType,UType,Parameter,ChannelNum) const;
   void ComputeU(float genpt,float& u1,float& u2, float nsigma=0) const;
   void CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met,float& metphi, float nsigma=0, float u1=-999, float u2=-999) const;
 
@@ -78,18 +89,18 @@ protected:
 
   // in principle could get the TF1s from the fit results
   // but this way, we can save everything in a file
-  TF1 *fmu[2][3]; // U[1,2] mean as a function of pT for Z(data), Z(mc), thing we are trying to correct
-  TF1 *fsigma1[2][3]; // sigma1
-  TF1 *fsigma2[2][3]; // sigma2
-  TF1 *fsigma[2][3]; // sigma
-  TF1 *fsigmaSingle[2][3];
+  TF1 *fmu[2][3][6]; // U[1,2] mean as a function of pT for Z(data), Z(mc), thing we are trying to correct
+  TF1 *fsigma1[2][3][6]; // sigma1
+  TF1 *fsigma2[2][3][6]; // sigma2
+  TF1 *fsigma[2][3][6]; // sigma
+  TF1 *fsigmaSingle[2][3][6];
 
   // directly store covariance matrices instead of fit results
-  TMatrixDSym *covMu[2][3];
-  TMatrixDSym *covSigma1[2][3];
-  TMatrixDSym *covSigma2[2][3];
-  TMatrixDSym *covSigma[2][3];
-  TMatrixDSym *covSigmaSingle[2][3];
+  TMatrixDSym *covMu[2][3][6];
+  TMatrixDSym *covSigma1[2][3][6];
+  TMatrixDSym *covSigma2[2][3][6];
+  TMatrixDSym *covSigma[2][3][6];
+  TMatrixDSym *covSigmaSingle[2][3][6];
 
   TRandom3 *rng;
 
@@ -101,7 +112,9 @@ protected:
   double *xxSigmaSingle{0};
 
   TString inName;
-  TString outName;
+  TString outName[6];
+
+  ChannelNum fCurrChannel;
 
 };
 
