@@ -3,7 +3,37 @@
 import ROOT
 from multiprocessing import Process, Queue
 import os
-from Corrector_cff import *
+from optparse import OptionParser
+import ConfigParser
+
+parser = OptionParser()
+
+parser.add_option('-c',help='Names a configuration file.',dest='configName',action='store',metavar='<name>')
+
+(opts,args) = parser.parse_args()
+
+cfgName = "default.cfg"
+if opts.__dict__['configName']:
+    cfgName = opts.configName
+
+config = ConfigParser.RawConfigParser()
+config.read(cfgName)
+numMaxProcesses = config.get('General','NumMaxProcesses')
+inDir           = config.get('FileLocation','InDir')
+outDir          = config.get('FileLocation','OutDir')
+inTreeName      = config.get('TreeNames','InTreeName')
+outTreeName     = config.get('TreeNames','OutTreeName')
+PhotonPtExpression      = config.get('InputExpressions','PhotonPtExpression')
+GenBosonPtExpression    = config.get('InputExpressions','GenBosonPtExpression')
+GenBosonPdgIdExpression = config.get('InputExpressions','GenBosonPdgIdExpression')
+DaughterPdgIdExpression = config.get('InputExpressions','DaughterPdgIdExpression')
+EventNumExpression      = config.get('InputExpressions','EventNumExpression')
+OutputPhotonPt       = config.get('OutputBranches','OutputPhotonPt')
+OutputPhotonSysUp    = config.get('OutputBranches','OutputPhotonSysUp')
+OutputPhotonSysDown  = config.get('OutputBranches','OutputPhotonSysDown')
+OutputPerpName       = config.get('OutputBranches','OutputPerpName')
+OutputParaName       = config.get('OutputBranches','OutputParaName')
+OutputRecoilPtName   = config.get('OutputBranches','OutputRecoilPtName')
 
 ROOT.gROOT.LoadMacro('RecoilCorrector.cc+')
 
@@ -55,9 +85,10 @@ def ApplyCorrection(inQueue):
             footUpBr   = outTree.Branch(OutputPhotonSysUp,footUp,OutputPhotonSysUp+"/F")
             footDownBr = outTree.Branch(OutputPhotonSysDown,footDown,OutputPhotonSysDown+"/F")
 
-            genBosPtF    = ROOT.TTreeFormula("GenBosPt",GenBosonPtExpression,inTree)
-            genBosPdgIdF = ROOT.TTreeFormula("GenBosPdgId",GenBosonPdgIdExpression,inTree)
-            eventNumF    = ROOT.TTreeFormula("EventNum",EventsNumExpression,inTree)
+            genBosPtF      = ROOT.TTreeFormula("GenBosPt",GenBosonPtExpression,inTree)
+            genBosPdgIdF   = ROOT.TTreeFormula("GenBosPdgId",GenBosonPdgIdExpression,inTree)
+            daughterPdgIdF = ROOT.TTreeFormula("DaughterPdgId",DaughterPdgIdExpression,inTree)
+            eventNumF      = ROOT.TTreeFormula("EventNum",EventsNumExpression,inTree)
 
             uPerp = array('f',[0.0])
             uPara = array('f',[0.0])
@@ -74,13 +105,20 @@ def ApplyCorrection(inQueue):
 
                 photonPt = photonPtF.EvalInstance()
 
+                if photonPt > 1000 or photonPt < 0:
+                    footPt[0]   = photonPt
+                    footUp[0]   = photonPt
+                    footDown[0] = photonPt
+                ##
+
                 footPt[0]   = photonPt + (ZmmFunc.Eval(photonPt) - GJetsFunc.Eval(photonPt))/(1 - ZmmFunc.GetParameter(1))
                 footUp[0]   = photonPt + (ZmmFuncUp.Eval(photonPt) - GJetsFuncDown.Eval(photonPt))/(1 - ZmmFuncUp.GetParameter(1))
                 footDown[0] = photonPt + (ZmmFuncDown.Eval(photonPt) - GJetsFuncUp.Eval(photonPt))/(1 - ZmmFuncDown.GetParameter(1))
 
-                genBosPt    = genBosPtF.EvalInstance()
-                genBosPdgId = genBosPdgIdF.EvalInstance()
-                eventNum    = eventNumF.EvalInstance()
+                genBosPt      = genBosPtF.EvalInstance()
+                genBosPdgId   = genBosPdgIdF.EvalInstance()
+                daughterPdgId = daughterPdgIdF.EvalInstance()
+                eventNum      = eventNumF.EvalInstance()
 
                 rc.SetSeed(eventNum)
 
@@ -90,9 +128,17 @@ def ApplyCorrection(inQueue):
                         if genBosPdg == 22:
                             rc.SetOutputName("GJets")
                         elif genBosPdg == 23:
-                            rc.SetOutputName("Zmm")      ### I need to come up with a better thing for this!!! Uh oh!!!
+                            if abs(daughterPdgId) == 11:
+                                rc.SetOutputName("Zee")
+                            else:
+                                rc.SetOutputName("Zee")
+                            ##
                         else:
-                            rc.SetOutputName("Wmn")
+                            if abs(daughterPdgId) == 11:
+                                rc.SetOutputName("Wen")
+                            else:
+                                rc.SetOutputName("Wmn")
+                            ##
                         ##
                         rc.LoadAllFits(smearingCorrections)
                     ##

@@ -35,30 +35,50 @@ void RecoilCorrector::SetFitResult(TF1 *f, TMatrixDSym *cov, RecoilType rType, U
   // form of f
   switch (p) {
     case kMu:
+      if (fmu[uType][rType]) {
+        delete fmu[uType][rType];
+        delete covMu[uType][rType];
+      }
       fmu[uType][rType] = f;
       covMu[uType][rType] = (TMatrixDSym*)cov->Clone();
       if (!xxMu)
         xxMu = new double[covMu[uType][rType]->GetNrows()];
       break;
     case kSigma1:
+      if (fsigma1[uType][rType]) {
+        delete fsigma1[uType][rType];
+        delete covSigma1[uType][rType];
+      }
       fsigma1[uType][rType] = f;
       covSigma1[uType][rType] =  (TMatrixDSym*)cov->Clone();
       if (!xxSigma1)
         xxSigma1 = new double[covSigma1[uType][rType]->GetNrows()];
       break;
     case kSigma2:
+      if (fsigma2[uType][rType]) {
+        delete fsigma2[uType][rType];
+        delete covSigma2[uType][rType];
+      }
       fsigma2[uType][rType] = f;
       covSigma2[uType][rType] =  (TMatrixDSym*)cov->Clone();
       if (!xxSigma2)
         xxSigma2 = new double[covSigma2[uType][rType]->GetNrows()];
       break;
     case kSigma:
+      if (fsigma[uType][rType]) {
+        delete fsigma[uType][rType];
+        delete covSigma[uType][rType];
+      }
       fsigma[uType][rType] = f;
       covSigma[uType][rType] =  (TMatrixDSym*)cov->Clone();
       if (!xxSigma)
         xxSigma = new double[covSigma[uType][rType]->GetNrows()];
       break;
     case kSigmaSingle:
+      if (fsigmaSingle[uType][rType]) {
+        delete fsigmaSingle[uType][rType];
+        delete covSigmaSingle[uType][rType];
+      }
       fsigmaSingle[uType][rType] = f;
       covSigmaSingle[uType][rType] =  (TMatrixDSym*)cov->Clone();
       if (!xxSigmaSingle)
