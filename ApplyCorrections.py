@@ -165,7 +165,7 @@ def ApplyCorrection(inQueue):
 
             numEntries = inTree.GetEntriesFast()
             for entry in range(numEntries):
-                if entry % 100000 == 0:
+                if entry % 50000 == 0:
                     print "Processing " + inFileName + "... " + str(float(entry)/numEntries * 100) + "%"
                 ##
                 inTree.GetEntry(entry)
@@ -203,20 +203,20 @@ def ApplyCorrection(inQueue):
                     if genBosPdgId != lastPdgId:
                         lastPdgId = genBosPdgId
                         if genBosPdgId == 22:
-                            rc.SetOutputName("gjets")
+                            rc.SetOutput(rc.kGJets)
                         elif genBosPdgId == 23:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Zee")
+                                rc.SetOutput(rc.kZee)
                             elif abs(daughterPdgId == 13):
-                                rc.SetOutputName("Zmm")
+                                rc.SetOutput(rc.kZmm)
                             else:
-                                rc.SetOutputName("Znn")
+                                rc.SetOutput(rc.kZnn)
                             ##
                         else:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Wen")
+                                rc.SetOutput(rc.kWen)
                             else:
-                                rc.SetOutputName("Wmn")
+                                rc.SetOutput(rc.kWmn)
                             ##
                         ##
                         rc.LoadAllFits(smearingCorrections)
