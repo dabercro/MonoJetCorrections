@@ -12,5 +12,8 @@ The corrector can then be run by doing
 ./ApplyCorrections.py -c <Config File Name>
 ```
 If you leave out the `-c` option, `default.cfg` will be used.
+Note that this will apply the footprint and smearing on all the events in the tree.
+The values are only useful though in the appropriate control region selection.
+Also remember, footprint corrections are only useful in data and smearing is only used in MC.
 
 That's it! (hopefully)

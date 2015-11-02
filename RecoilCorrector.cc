@@ -1,3 +1,4 @@
+#include <iostream>
 #include "RecoilCorrector.h"
 #include "TVector2.h"
 
@@ -7,6 +8,20 @@ RecoilCorrector::RecoilCorrector() :
   rng = new TRandom3();
   inName = "Zmm";
   outName = "Wjets";
+  for (unsigned int iR=0; iR!=3; ++iR) {
+    for (unsigned int iU=0; iU!=2; ++iU) {
+      fmu[iU][iR] = NULL;
+      covMu[iU][iR] = NULL;
+      fsigma1[iU][iR] = NULL;
+      covSigma1[iU][iR] = NULL;
+      fsigma2[iU][iR] = NULL;
+      covSigma2[iU][iR] = NULL;
+      fsigma[iU][iR] = NULL;
+      covSigma[iU][iR] = NULL;
+      fsigmaSingle[iU][iR] = NULL;
+      covSigmaSingle[iU][iR] = NULL;
+    }
+  } 
 }
 
 RecoilCorrector::~RecoilCorrector() { 
@@ -92,11 +107,11 @@ void RecoilCorrector::LoadAllFits(TFile *fIn) {
   TString recoilNames[3] = {"Data_"+inName,"MC_"+inName,"MC_"+outName};
   TF1 *f;
   TMatrixDSym *cov;
-  fprintf(stderr,"RecoilCorrector::LoadAllFits: Careful not to close %s until you are done with RecoilCorrector.\n",fIn->GetName());
+  // fprintf(stderr,"RecoilCorrector::LoadAllFits: Careful not to close %s until you are done with RecoilCorrector.\n",fIn->GetName());
   for (unsigned int iR=0; iR!=3; ++iR) {
     for (int iU=0; iU!=2; ++iU) {
       fitBaseName = TString::Format("u%i_%s",iU+1,recoilNames[iR].Data());
-      fprintf(stderr,"loading %s\n",fitBaseName.Data()); 
+      // fprintf(stderr,"loading %s\n",fitBaseName.Data()); 
       
       f = (TF1*)fIn->Get("fcn_mu_"+fitBaseName);
       cov = (TMatrixDSym*)fIn->Get("cov_mu_"+fitBaseName);
@@ -105,7 +120,7 @@ void RecoilCorrector::LoadAllFits(TFile *fIn) {
       f = (TF1*)fIn->Get("fcn_sig1_"+fitBaseName);
       cov = (TMatrixDSym*)fIn->Get("cov_sig1_"+fitBaseName);
       SetFitResult(f,cov,(RecoilType)iR,(UType)iU,kSigma1);      
-      
+
       f = (TF1*)fIn->Get("fcn_sig2_"+fitBaseName);
       cov = (TMatrixDSym*)fIn->Get("cov_sig2_"+fitBaseName);
       SetFitResult(f,cov,(RecoilType)iR,(UType)iU,kSigma2);      
@@ -177,7 +192,7 @@ void RecoilCorrector::ComputeU(float genpt, float &u1, float &u2, float nsigma/*
   // TODO: improve to treat parameters independently
   // currently making conservative assumption of maximal correlation
   if (nsigma != 0.) {
-    mu     += nsigma * GetError(genpt,kMCOut,kU1,kMu)     * fmu[kU1][kDataIn]->Eval(genpt)     / fmu[kU1][kMCIn]->Eval(genpt);
+    mu     += nsigma * GetError(genpt,kMCOut,kU1,kMu)     * (fmu[kU1][kDataIn]->Eval(genpt)-genpt) / (fmu[kU1][kMCIn]->Eval(genpt) - genpt);
     sigma1 += nsigma * GetError(genpt,kMCOut,kU1,kSigma1) * fsigma1[kU1][kDataIn]->Eval(genpt) / fsigma1[kU1][kMCIn]->Eval(genpt); 
     sigma2 += nsigma * GetError(genpt,kMCOut,kU1,kSigma2) * fsigma2[kU1][kDataIn]->Eval(genpt) / fsigma2[kU1][kMCIn]->Eval(genpt);
     sigma  += nsigma * GetError(genpt,kMCOut,kU1,kSigma)  * fsigma[kU1][kDataIn]->Eval(genpt)  / fsigma[kU1][kMCIn]->Eval(genpt);
