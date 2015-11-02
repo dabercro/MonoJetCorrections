@@ -47,6 +47,7 @@ OutputRecoilPtUpName  = config.get('OutputBranches','OutputRecoilPtUpName')
 OutputPerpDownName      = config.get('OutputBranches','OutputPerpDownName')
 OutputParaDownName      = config.get('OutputBranches','OutputParaDownName')
 OutputRecoilPtDownName  = config.get('OutputBranches','OutputRecoilPtDownName')
+reportFreq  = int(config.get('Misc','ReportFrequency'))
 
 if config.has_option('InputExpressions','MacrosToLoad'):
     macros = (config.get('InputExpressions','MacrosToLoad')).strip(' ').split(',')
@@ -102,7 +103,7 @@ def ApplyCorrection(inQueue):
                 print "##   InTree not successfully fetched in " + inFileName + "!"
                 print "##   Check config file for tree name."
                 print "##"
-                print "##   Aborting..."
+                print "##   Aborting ..."
                 print "##"
                 print "###############################################################"
                 print ""
@@ -165,8 +166,8 @@ def ApplyCorrection(inQueue):
 
             numEntries = inTree.GetEntriesFast()
             for entry in range(numEntries):
-                if entry % 100000 == 0:
-                    print "Processing " + inFileName + "... " + str(float(entry)/numEntries * 100) + "%"
+                if entry % reportFreq == 0:
+                    print "Processing " + inFileName + " ... " + str(float(entry)/numEntries * 100) + "%"
                 ##
                 inTree.GetEntry(entry)
 
@@ -250,7 +251,7 @@ def ApplyCorrection(inQueue):
             print "Finished " + inFileName + " ... Elapsed time: " + str(time() - startTime) + " seconds"
             ##
         except:
-            print "Worker finished..."
+            print "Worker finished ..."
             smearingCorrections.Close()
             running = False
         ##
