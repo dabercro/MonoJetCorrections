@@ -102,7 +102,7 @@ def ApplyCorrection(inQueue):
                 print "##   InTree not successfully fetched in " + inFileName + "!"
                 print "##   Check config file for tree name."
                 print "##"
-                print "##   Aborting..."
+                print "##   Aborting ..."
                 print "##"
                 print "###############################################################"
                 print ""
@@ -165,8 +165,8 @@ def ApplyCorrection(inQueue):
 
             numEntries = inTree.GetEntriesFast()
             for entry in range(numEntries):
-                if entry % 50000 == 0:
-                    print "Processing " + inFileName + "... " + str(float(entry)/numEntries * 100) + "%"
+                if entry % 10000 == 0:
+                    print "Processing " + inFileName + " ... " + str(float(entry)/numEntries * 100) + "%"
                 ##
                 inTree.GetEntry(entry)
 
@@ -250,7 +250,7 @@ def ApplyCorrection(inQueue):
             print "Finished " + inFileName + " ... Elapsed time: " + str(time() - startTime) + " seconds"
             ##
         except:
-            print "Worker finished..."
+            print "Worker finished ..."
             smearingCorrections.Close()
             running = False
         ##

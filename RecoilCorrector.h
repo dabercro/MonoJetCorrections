@@ -61,17 +61,17 @@ public:
   // initialize
   void SetCorrectionType(CorrectionType k)  { fCorrectionType = k; }
   void SetInputName(const char *s)          { inName = s;          }
-  void SetOutputName(const char *s)         { outName = s;         } 
+  /* void SetOutputName(const char *s)         { outName = s;         }  */
   void SetSeed(unsigned int u)              { rng->SetSeed(u);     }
 
   void SetOutput(ChannelNum c)              { fCurrChannel = c;    }
 
   // read inputs
-  void SetFitResult(TF1*,TMatrixDSym*,RecoilType,UType,Parameter);
+  void SetFitResult(TF1*,TMatrixDSym*,RecoilType,UType,Parameter,ChannelNum);
   void LoadAllFits(TFile*);
 
   // computations
-  double GetError(double,RecoilType,UType,Parameter) const;
+  double GetError(double,RecoilType,UType,Parameter,ChannelNum) const;
   void ComputeU(float genpt,float& u1,float& u2, float nsigma=0) const;
   void CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met,float& metphi, float nsigma=0, float u1=-999, float u2=-999) const;
 
