@@ -77,8 +77,30 @@ GJetsFuncDown = phoCorrections.Get("mu_down_gjets_Data")
 def ApplyCorrection(inQueue):
     running = True
     smearingCorrections = ROOT.TFile("SmearingFits.root")
-    rc = ROOT.RecoilCorrector()
-    rc.SetInputName("Zmm")
+    rcZmm = ROOT.RecoilCorrector()
+    rcZmm.SetInputName("Zmm")
+    rcZmm.SetOutputName("Zmm")
+    rcZmm.LoadAllFits(smearingCorrections)
+    rcZee = ROOT.RecoilCorrector()
+    rcZee.SetInputName("Zmm")
+    rcZee.SetOutputName("Zee")
+    rcZee.LoadAllFits(smearingCorrections)
+    rcZnn = ROOT.RecoilCorrector()
+    rcZnn.SetInputName("Zmm")
+    rcZnn.SetOutputName("Znn")
+    rcZnn.LoadAllFits(smearingCorrections)
+    rcGJets = ROOT.RecoilCorrector()
+    rcGJets.SetInputName("Zmm")
+    rcGJets.SetOutputName("GJets")
+    rcGJets.LoadAllFits(smearingCorrections)
+    rcWmn = ROOT.RecoilCorrector()
+    rcWmn.SetInputName("Zmm")
+    rcWmn.SetOutputName("Wmn")
+    rcWmn.LoadAllFits(smearingCorrections)
+    rcWen = ROOT.RecoilCorrector()
+    rcWen.SetInputName("Zmm")
+    rcWen.SetOutputName("Wen")
+    rcWen.LoadAllFits(smearingCorrections)
     while running:
         try:
             inFileName = inQueue.get(True,2)
@@ -197,30 +219,29 @@ def ApplyCorrection(inQueue):
                 daughterPdgId = int(daughterPdgIdF.EvalInstance())
                 eventNum      = int(eventNumF.EvalInstance())
 
-                rc.SetSeed(eventNum)
-
                 if genBosPdgId in [22,23,24,-24]:
                     if genBosPdgId != lastPdgId:
                         lastPdgId = genBosPdgId
                         if genBosPdgId == 22:
-                            rc.SetOutputName("gjets")
+                            rc = rcGJets
                         elif genBosPdgId == 23:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Zee")
+                                rc = rcZee
                             elif abs(daughterPdgId == 13):
-                                rc.SetOutputName("Zmm")
+                                rc = rcZmm
                             else:
-                                rc.SetOutputName("Znn")
+                                rc = rcZnn
                             ##
                         else:
                             if abs(daughterPdgId) == 11:
-                                rc.SetOutputName("Wen")
+                                rc = rcWen
                             else:
-                                rc.SetOutputName("Wmn")
+                                rc = rcWmn
                             ##
                         ##
-                        rc.LoadAllFits(smearingCorrections)
                     ##
+                    rc.SetSeed(eventNum)
+
                     rc.ComputeU(genBosPt,uPerp,uPara)
                     rc.ComputeU(genBosPt,uPerpUp,uParaUp,1.0)
                     rc.ComputeU(genBosPt,uPerpDown,uParaDown,-1.0)
@@ -251,6 +272,12 @@ def ApplyCorrection(inQueue):
             ##
         except:
             print "Worker finished..."
+            del rcZmm
+            del rcZee
+            del rcZnn
+            del rcGJets
+            del rcWmn
+            del rcWen
             smearingCorrections.Close()
             running = False
         ##
