@@ -175,6 +175,11 @@ def ApplyCorrection(inQueue):
                 photonPt = float(photonPtF.EvalInstance())
                 ZPt      = float(ZPtF.EvalInstance())
 
+                genBosPt      = float(genBosPtF.EvalInstance())
+                genBosPdgId   = int(genBosPdgIdF.EvalInstance())
+                daughterPdgId = int(daughterPdgIdF.EvalInstance())
+                eventNum      = int(eventNumF.EvalInstance())
+
                 if photonPt > 1000 or photonPt < 0:
                     footPt[0]   = photonPt
                     footUp[0]   = photonPt
@@ -184,7 +189,7 @@ def ApplyCorrection(inQueue):
                     footUp[0]   = photonPt + (ZmmFuncUp.Eval(photonPt) - GJetsFuncDown.Eval(photonPt))/(1 - ZmmFuncUp.GetParameter(1))
                     footDown[0] = photonPt + (ZmmFuncDown.Eval(photonPt) - GJetsFuncUp.Eval(photonPt))/(1 - ZmmFuncDown.GetParameter(1))
                 ##
-                if ZPt > 1000 or ZPt < 0:
+                if ZPt > 1000 or ZPt < 0 or abs(daughterPdgId) != 11:
                     ZfootPt[0]   = ZPt
                     ZfootUp[0]   = ZPt
                     ZfootDown[0] = ZPt
@@ -193,11 +198,6 @@ def ApplyCorrection(inQueue):
                     ZfootUp[0]   = ZPt + (ZmmFuncUp.Eval(ZPt) - ZeeFuncDown.Eval(ZPt))/(1 - ZmmFuncUp.GetParameter(1))
                     ZfootDown[0] = ZPt + (ZmmFuncDown.Eval(ZPt) - ZeeFuncUp.Eval(ZPt))/(1 - ZmmFuncDown.GetParameter(1))
                 ##
-
-                genBosPt      = float(genBosPtF.EvalInstance())
-                genBosPdgId   = int(genBosPdgIdF.EvalInstance())
-                daughterPdgId = int(daughterPdgIdF.EvalInstance())
-                eventNum      = int(eventNumF.EvalInstance())
 
                 rc.SetSeed(eventNum)
 
