@@ -276,4 +276,6 @@ for aProccess in theProcesses:
     aProccess.join()
 ##
 
+phoCorrections.Close()
+
 print "All done!"
