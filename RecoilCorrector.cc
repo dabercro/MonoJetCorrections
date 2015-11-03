@@ -187,7 +187,7 @@ double RecoilCorrector::GetError(double x,RecoilType r,UType u,Parameter p,Chann
     }
   }
 
-  return error;
+  return TMath::Sqrt(error);
 }
 
 void RecoilCorrector::ComputeU(float genpt, float &u1, float &u2, float nsigma/*=0*/) const {
