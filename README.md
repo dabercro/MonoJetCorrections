@@ -7,9 +7,11 @@ Let me know if you run into any problems.
 
 Either edit `default.cfg` to have the names of your directories, trees, and branches, or
 you can make your own configuration file.
+I'd recommend doing the latter because I have a habit of committing an entire directory 
+when making changes.
 The corrector can then be run by doing
 ```
-./ApplyCorrections.py -c <Config File Name>
+./ApplyCorrections.py -c <ConfigFileName>
 ```
 If you leave out the `-c` option, `default.cfg` will be used.
 Note that this will apply the footprint and smearing on all the events in the tree.
