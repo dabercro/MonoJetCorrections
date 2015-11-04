@@ -212,18 +212,34 @@ def ApplyCorrection(inQueue):
                     footUp[0]   = photonPt
                     footDown[0] = photonPt
                 else:
-                    footPt[0]   = photonPt + (ZmmFunc.Eval(photonPt) - GJetsFunc.Eval(photonPt))/(1 - ZmmFunc.GetParameter(1))
-                    footUp[0]   = photonPt + (ZmmFuncUp.Eval(photonPt) - GJetsFuncDown.Eval(photonPt))/(1 - ZmmFuncUp.GetParameter(1))
-                    footDown[0] = photonPt + (ZmmFuncDown.Eval(photonPt) - GJetsFuncUp.Eval(photonPt))/(1 - ZmmFuncDown.GetParameter(1))
+                    mmFuncVal  = ZmmFunc.Eval(photonPt)
+                    mmUpErr2   = ZmmFuncUp.Eval(photonPt) - ZmmFunc.Eval(photonPt)
+                    mmDownErr2 = ZmmFunc.Eval(photonPt) - ZmmFuncDown.Eval(photonPt)
+
+                    gjetsFuncVal  = GJetsFunc.Eval(photonPt)
+                    gjetsUpErr2   = GJetsFuncUp.Eval(photonPt) - GJetsFunc.Eval(photonPt)
+                    gjetsDownErr2 = GJetsFunc.Eval(photonPt) - GJetsFuncDown.Eval(photonPt)
+
+                    footPt[0]   = photonPt + (mmFuncVal - gjetsFuncVal)/(1 - ZmmFunc.GetParameter(1))
+                    footUp[0]   = photonPt + (mmFuncVal - gjetsFuncVal + sqrt(mmUpErr2 + gjetsDownErr2))/(1 - ZmmFuncUp.GetParameter(1) - 2*ZmmFuncUp.GetParameter(2)*photonPt)
+                    footDown[0] = photonPt + (mmFuncVal - gjetsFuncVal - sqrt(mmDownErr2 + gjetsUpErr2))/(1 - ZmmFuncDown.GetParameter(1) - 2*ZmmFuncDown.GetParameter(2)*photonPt)
                 ##
                 if ZPt > 1000 or ZPt < 0 or abs(daughterPdgId) != 11:
                     ZfootPt[0]   = ZPt
                     ZfootUp[0]   = ZPt
                     ZfootDown[0] = ZPt
                 else:
-                    ZfootPt[0]   = ZPt + (ZmmFunc.Eval(ZPt) - ZeeFunc.Eval(ZPt))/(1 - ZmmFunc.GetParameter(1))
-                    ZfootUp[0]   = ZPt + (ZmmFuncUp.Eval(ZPt) - ZeeFuncDown.Eval(ZPt))/(1 - ZmmFuncUp.GetParameter(1))
-                    ZfootDown[0] = ZPt + (ZmmFuncDown.Eval(ZPt) - ZeeFuncUp.Eval(ZPt))/(1 - ZmmFuncDown.GetParameter(1))
+                    mmFuncVal  = ZmmFunc.Eval(photonPt)
+                    mmUpErr2   = ZmmFuncUp.Eval(photonPt) - ZmmFunc.Eval(photonPt)
+                    mmDownErr2 = ZmmFunc.Eval(photonPt) - ZmmFuncDown.Eval(photonPt)
+
+                    eeFuncVal  = ZeeFunc.Eval(photonPt)
+                    eeUpErr2   = ZeeFuncUp.Eval(photonPt) - ZeeFunc.Eval(photonPt)
+                    eeDownErr2 = ZeeFunc.Eval(photonPt) - ZeeFuncDown.Eval(photonPt)
+
+                    footPt[0]   = ZPt + (mmFuncVal - eeFuncVal)/(1 - ZmmFunc.GetParameter(1))
+                    footUp[0]   = ZPt + (mmFuncVal - eeFuncVal + sqrt(mmUpErr2 + eeDownErr2))/(1 - ZmmFuncUp.GetParameter(1) - 2*ZmmFuncUp.GetParameter(2)*ZPt)
+                    footDown[0] = ZPt + (mmFuncVal - eeFuncVal - sqrt(mmDownErr2 + eeUpErr2))/(1 - ZmmFuncDown.GetParameter(1) - 2*ZmmFuncDown.GetParameter(2)*ZPt)
                 ##
 
                 rc.SetSeed(eventNum)
