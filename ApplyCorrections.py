@@ -75,6 +75,24 @@ GJetsFunc = phoCorrections.Get("mu_gjets_Data")
 GJetsFuncUp = phoCorrections.Get("mu_up_gjets_Data")
 GJetsFuncDown = phoCorrections.Get("mu_down_gjets_Data")
 
+branchesCheck = [
+    OutputPhotonPt,
+    OutputPhotonSysUp,
+    OutputPhotonSysDown,
+    OutputZPt,
+    OutputZSysUp,
+    OutputZSysDown,
+    OutputPerpName,
+    OutputParaName,
+    OutputRecoilPtName,
+    OutputPerpUpName,
+    OutputParaUpName,
+    OutputRecoilPtUpName,
+    OutputPerpDownName,
+    OutputParaDownName,
+    OutputRecoilPtDownName,
+]
+
 def ApplyCorrection(inQueue):
     running = True
     smearingCorrections = ROOT.TFile("SmearingFits.root")
@@ -121,6 +139,15 @@ def ApplyCorrection(inQueue):
                 outFile.cd()
                 outTree = ROOT.TTree(outTreeName,outTreeName)
             ##
+
+            for check in branchesCheck:
+                if outTree.GetBranch(check) != None:
+                    print "Branch " + check + " already exists in " + outTreeName + "!" 
+                    print "Exiting ..."
+                    exit(1)
+                ##
+            ##
+
             photonPtF = ROOT.TTreeFormula("PhotonPt",PhotonPtExpression,inTree)
             ZPtF      = ROOT.TTreeFormula("ZPt",DiLeptonPtExpression,inTree)
 
@@ -130,13 +157,6 @@ def ApplyCorrection(inQueue):
             ZfootPt   = array('f',[0.0])
             ZfootUp   = array('f',[0.0])
             ZfootDown = array('f',[0.0])
-
-            footPtBr    = outTree.Branch(OutputPhotonPt,footPt,OutputPhotonPt+"/F")
-            footUpBr    = outTree.Branch(OutputPhotonSysUp,footUp,OutputPhotonSysUp+"/F")
-            footDownBr  = outTree.Branch(OutputPhotonSysDown,footDown,OutputPhotonSysDown+"/F")
-            ZfootPtBr   = outTree.Branch(OutputZPt,ZfootPt,OutputZPt+"/F")
-            ZfootUpBr   = outTree.Branch(OutputZSysUp,ZfootUp,OutputZSysUp+"/F")
-            ZfootDownBr = outTree.Branch(OutputZSysDown,ZfootDown,OutputZSysDown+"/F")
 
             genBosPtF      = ROOT.TTreeFormula("GenBosPt",GenBosonPtExpression,inTree)
             genBosPdgIdF   = ROOT.TTreeFormula("GenBosPdgId",GenBosonPdgIdExpression,inTree)
@@ -152,6 +172,13 @@ def ApplyCorrection(inQueue):
             uPerpDown = array('f',[0.0])
             uParaDown = array('f',[0.0])
             uMagDown  = array('f',[0.0])
+
+            footPtBr    = outTree.Branch(OutputPhotonPt,footPt,OutputPhotonPt+"/F")
+            footUpBr    = outTree.Branch(OutputPhotonSysUp,footUp,OutputPhotonSysUp+"/F")
+            footDownBr  = outTree.Branch(OutputPhotonSysDown,footDown,OutputPhotonSysDown+"/F")
+            ZfootPtBr   = outTree.Branch(OutputZPt,ZfootPt,OutputZPt+"/F")
+            ZfootUpBr   = outTree.Branch(OutputZSysUp,ZfootUp,OutputZSysUp+"/F")
+            ZfootDownBr = outTree.Branch(OutputZSysDown,ZfootDown,OutputZSysDown+"/F")
 
             uPerpBr = outTree.Branch(OutputPerpName,uPerp,OutputPerpName+"/F")
             uParaBr = outTree.Branch(OutputParaName,uPara,OutputParaName+"/F")
@@ -240,7 +267,25 @@ def ApplyCorrection(inQueue):
                     uMagDown[0]  = -5
                 ##
 
-                outTree.Fill()
+                if inTree == outTree:
+                    footPtBr.Fill()
+                    footUpBr.Fill()
+                    footDownBr.Fill()
+                    ZfootPtBr.Fill()
+                    ZfootUpBr.Fill()
+                    ZfootDownBr.Fill()
+                    uPerpBr.Fill()
+                    uParaBr.Fill()
+                    uMagBr.Fill()
+                    uPerpUpBr.Fill()
+                    uParaUpBr.Fill()
+                    uMagUpBr.Fill()
+                    uPerpDownBr.Fill()
+                    uParaDownBr.Fill()
+                    uMagDownBr.Fill()
+                else:
+                    outTree.Fill()
+                ##
             ##
             outFile.cd()
             outTree.Write()
@@ -265,6 +310,10 @@ for inFileName in os.listdir(inDir):
     if inFileName.endswith(".root"):
         theQueue.put(inFileName)
 ##
+
+print ""
+print "About to start " + str(numMaxProcesses) + " workers!"
+print ""
 
 for worker in range(numMaxProcesses):
     aProcess = Process(target=ApplyCorrection, args=(theQueue,))
