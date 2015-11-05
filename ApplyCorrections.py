@@ -63,8 +63,8 @@ for aMacro in macros:
 ROOT.gROOT.LoadMacro('macros/RecoilCorrector.cc+')
 
 if len(macros) == 0:
-    ROOT.gROOT.LoadMacro('macros/applicatorAllBranches.cc+')
-    applicator = ROOT.applicatorAllBranches
+    ROOT.gROOT.LoadMacro('macros/applicatorOnlyBranches.cc+')
+    applicator = ROOT.applicatorOnlyBranches
 else:
     ROOT.gROOT.LoadMacro('macros/applicator.cc+')
     applicator = ROOT.applicator
