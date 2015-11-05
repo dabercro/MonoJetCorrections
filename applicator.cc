@@ -34,7 +34,7 @@ void applicator(TString outDir,
                 TString OutputRecoilPtUpName,
                 TString OutputPerpDownName,
                 TString OutputParaDownName,
-                TString OutputRecoilPtDownName                
+                TString OutputRecoilPtDownName,
                 TF1* ZmmFunc,
                 TF1* ZmmFuncUp,
                 TF1* ZmmFuncDown,
@@ -44,9 +44,10 @@ void applicator(TString outDir,
                 TF1* GJetsFunc,
                 TF1* GJetsFuncUp,
                 TF1* GJetsFuncDown,
-                RecoilCorrectory* rc,
+                RecoilCorrector* rc,
                 int reportFreq
                 )
+
 {
   TFile *inFile  = 0;
   TFile *outFile = 0;
@@ -128,7 +129,7 @@ void applicator(TString outDir,
   int numEntries = inTree->GetEntriesFast();
   for (int entry = 0; entry != numEntries; ++entry) {
     if (entry % reportFreq == 0)
-      std::cout <<  "Processing " << inFileName << " ... " << float(entry)/numEntries * 100 << "%";
+      std::cout <<  "Processing " << inFileName << " ... " << float(entry)/numEntries * 100 << "%" << std::endl;
 
     inTree->GetEntry(entry);
 
@@ -187,7 +188,7 @@ void applicator(TString outDir,
         else if (genBosPdgId == 23) {
           if (abs(daughterPdgId) == 11)
             rc->SetOutput(RecoilCorrector::kZee);
-          else if (abs(daughterPdgId == 13))
+          else if (abs(daughterPdgId) == 13)
             rc->SetOutput(RecoilCorrector::kZmm);
           else
             rc->SetOutput(RecoilCorrector::kZnn);
@@ -202,9 +203,9 @@ void applicator(TString outDir,
       rc->ComputeU(genBosPt,uPerp,uPara);
       rc->ComputeU(genBosPt,uPerpUp,uParaUp,1.0);
       rc->ComputeU(genBosPt,uPerpDown,uParaDown,-1.0);
-      uMag = TMath::sqrt(uPerp*uPerp + uPara*uPara);
-      uMagUp = TMath::sqrt(uPerpUp*uPerpUp + uParaUp*uParaUp);
-      uMagDown = TMath::sqrt(uPerpDown*uPerpDown + uParaDown*uParaDown);
+      uMag = TMath::Sqrt(uPerp*uPerp + uPara*uPara);
+      uMagUp = TMath::Sqrt(uPerpUp*uPerpUp + uParaUp*uParaUp);
+      uMagDown = TMath::Sqrt(uPerpDown*uPerpDown + uParaDown*uParaDown);
     }
     else {
       uPerp = 300;

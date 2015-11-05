@@ -106,7 +106,43 @@ def ApplyCorrection(inQueue):
             print "About to process " + inFileName
             startTime = time()
             ROOT.applicator(
-                
+                outDir, 
+                inDir,
+                inFileName,
+                inTreeName,
+                outTreeName,
+                PhotonPtExpression,
+                DiLeptonPtExpression,
+                GenBosonPtExpression,
+                GenBosonPdgIdExpression,
+                DaughterPdgIdExpression,
+                EventNumExpression,
+                OutputPhotonPt,
+                OutputPhotonSysUp,
+                OutputPhotonSysDown,
+                OutputZPt,
+                OutputZSysUp,
+                OutputZSysDown,
+                OutputPerpName,
+                OutputParaName,
+                OutputRecoilPtName,
+                OutputPerpUpName,
+                OutputParaUpName,
+                OutputRecoilPtUpName,
+                OutputPerpDownName,
+                OutputParaDownName,
+                OutputRecoilPtDownName,
+                ZmmFunc,
+                ZmmFuncUp,
+                ZmmFuncDown,
+                ZeeFunc,
+                ZeeFuncUp,
+                ZeeFuncDown,
+                GJetsFunc,
+                GJetsFuncUp,
+                GJetsFuncDown,
+                rc,
+                reportFreq
                 )
             print "Finished " + inFileName + " ... Elapsed time: " + str(time() - startTime) + " seconds"
             ##
