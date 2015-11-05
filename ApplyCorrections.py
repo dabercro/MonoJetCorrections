@@ -57,11 +57,18 @@ else:
 
 for aMacro in macros:
     print "Loading " + aMacro + " ..."
-    ROOT.gROOT.LoadMacro(aMacro)
+    ROOT.gROOT.LoadMacro('macros/'+aMacro)
 ##
 
-ROOT.gROOT.LoadMacro('RecoilCorrector.cc+')
-ROOT.gROOT.LoadMacro('applicator.cc+')
+ROOT.gROOT.LoadMacro('macros/RecoilCorrector.cc+')
+
+if len(macros) == 0:
+    ROOT.gROOT.LoadMacro('macros/applicatorAllBranches.cc+')
+    applicator = ROOT.applicatorAllBranches
+else:
+    ROOT.gROOT.LoadMacro('macros/applicator.cc+')
+    applicator = ROOT.applicator
+##
 
 sqrt = ROOT.TMath.Sqrt
 
@@ -105,7 +112,7 @@ def ApplyCorrection(inQueue):
             inFileName = inQueue.get(True,2)
             print "About to process " + inFileName
             startTime = time()
-            ROOT.applicator(
+            applicator(
                 outDir, 
                 inDir,
                 inFileName,
