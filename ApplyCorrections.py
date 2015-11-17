@@ -52,6 +52,19 @@ OutputParaFootDownName      = config.get('OutputBranches','OutputParaFootDownNam
 OutputRecoilPtFootDownName  = config.get('OutputBranches','OutputRecoilPtFootDownName')
 reportFreq  = int(config.get('Misc','ReportFrequency'))
 
+OutputPerpLinearUpName      = config.get('OutputBranches','OutputPerpLinearUpName')
+OutputParaLinearUpName      = config.get('OutputBranches','OutputParaLinearUpName')
+OutputRecoilPtLinearUpName  = config.get('OutputBranches','OutputRecoilPtLinearUpName')
+OutputPerpLinearDownName      = config.get('OutputBranches','OutputPerpLinearDownName')
+OutputParaLinearDownName      = config.get('OutputBranches','OutputParaLinearDownName')
+OutputRecoilPtLinearDownName  = config.get('OutputBranches','OutputRecoilPtLinearDownName')
+OutputPerpQuadUpName      = config.get('OutputBranches','OutputPerpQuadUpName')
+OutputParaQuadUpName      = config.get('OutputBranches','OutputParaQuadUpName')
+OutputRecoilPtQuadUpName  = config.get('OutputBranches','OutputRecoilPtQuadUpName')
+OutputPerpQuadDownName      = config.get('OutputBranches','OutputPerpQuadDownName')
+OutputParaQuadDownName      = config.get('OutputBranches','OutputParaQuadDownName')
+OutputRecoilPtQuadDownName  = config.get('OutputBranches','OutputRecoilPtQuadDownName')
+
 if config.has_option('InputExpressions','MacrosToLoad'):
     macros = (config.get('InputExpressions','MacrosToLoad')).strip(' ').split(',')
 else:
@@ -85,26 +98,6 @@ ZeeFuncDown = phoCorrections.Get("mu_down_Zee_Data")
 GJetsFunc = phoCorrections.Get("mu_gjets_Data")
 GJetsFuncUp = phoCorrections.Get("mu_up_gjets_Data")
 GJetsFuncDown = phoCorrections.Get("mu_down_gjets_Data")
-
-branchesCheck = [
-    OutputPerpName,
-    OutputParaName,
-    OutputRecoilPtName,
-    OutputParaScaleUpName,
-    OutputRecoilPtScaleUpName,
-    OutputParaScaleDownName,
-    OutputRecoilPtScaleDownName,
-    OutputPerpResolutionUpName,
-    OutputParaResolutionUpName,
-    OutputRecoilPtResolutionUpName,
-    OutputPerpResolutionDownName,
-    OutputParaResolutionDownName,
-    OutputRecoilPtResolutionDownName,
-    OutputParaFootUpName,
-    OutputRecoilPtFootUpName,
-    OutputParaFootDownName,
-    OutputRecoilPtFootDownName
-]
 
 def ApplyCorrection(inQueue):
     running = True
@@ -146,6 +139,18 @@ def ApplyCorrection(inQueue):
                 OutputRecoilPtFootUpName,
                 OutputParaFootDownName,
                 OutputRecoilPtFootDownName,
+                OutputPerpLinearUpName,
+                OutputParaLinearUpName,
+                OutputRecoilPtLinearUpName,
+                OutputPerpLinearDownName,
+                OutputParaLinearDownName,
+                OutputRecoilPtLinearDownName,
+                OutputPerpQuadUpName,
+                OutputParaQuadUpName,
+                OutputRecoilPtQuadUpName,
+                OutputPerpQuadDownName,
+                OutputParaQuadDownName,
+                OutputRecoilPtQuadDownName,
                 ZmmFunc,
                 ZmmFuncUp,
                 ZmmFuncDown,

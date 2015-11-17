@@ -36,6 +36,18 @@ void applicatorOnlyBranches(TString outDir,
                             TString OutputRecoilPtFootUpName,
                             TString OutputParaFootDownName,
                             TString OutputRecoilPtFootDownName,
+                            TString OutputPerpLinearUpName,
+                            TString OutputParaLinearUpName,
+                            TString OutputRecoilPtLinearUpName,
+                            TString OutputPerpLinearDownName,
+                            TString OutputParaLinearDownName,
+                            TString OutputRecoilPtLinearDownName,
+                            TString OutputPerpQuadUpName,
+                            TString OutputParaQuadUpName,
+                            TString OutputRecoilPtQuadUpName,
+                            TString OutputPerpQuadDownName,
+                            TString OutputParaQuadDownName,
+                            TString OutputRecoilPtQuadDownName,
                             TF1* ZmmFunc,
                             TF1* ZmmFuncUp,
                             TF1* ZmmFuncDown,
@@ -124,6 +136,18 @@ void applicatorOnlyBranches(TString outDir,
   float uMagFootUp = 0;
   float uParaFootDown = 0;
   float uMagFootDown = 0;
+  float uPerpLinearUp = 0;
+  float uParaLinearUp = 0;
+  float uMagLinearUp = 0;
+  float uPerpLinearDown = 0;
+  float uParaLinearDown = 0;
+  float uMagLinearDown = 0;
+  float uPerpQuadUp = 0;
+  float uParaQuadUp = 0;
+  float uMagQuadUp = 0;
+  float uPerpQuadDown = 0;
+  float uParaQuadDown = 0;
+  float uMagQuadDown = 0;
 
   TBranch *uPerpBr = outTree->Branch(OutputPerpName,&uPerp,OutputPerpName+"/F");
   TBranch *uParaBr = outTree->Branch(OutputParaName,&uPara,OutputParaName+"/F");
@@ -142,6 +166,18 @@ void applicatorOnlyBranches(TString outDir,
   TBranch *uMagFootUpBr  = outTree->Branch(OutputRecoilPtFootUpName,&uMagFootUp,OutputRecoilPtFootUpName+"/F");
   TBranch *uParaFootDownBr = outTree->Branch(OutputParaFootDownName,&uParaFootDown,OutputParaFootDownName+"/F");
   TBranch *uMagFootDownBr  = outTree->Branch(OutputRecoilPtFootDownName,&uMagFootDown,OutputRecoilPtFootDownName+"/F");
+  TBranch *uPerpLinearUpBr = outTree->Branch(OutputPerpLinearUpName,&uPerpLinearUp,OutputPerpLinearUpName+"/F");
+  TBranch *uParaLinearUpBr = outTree->Branch(OutputParaLinearUpName,&uParaLinearUp,OutputParaLinearUpName+"/F");
+  TBranch *uMagLinearUpBr  = outTree->Branch(OutputRecoilPtLinearUpName,&uMagLinearUp,OutputRecoilPtLinearUpName+"/F");
+  TBranch *uPerpLinearDownBr = outTree->Branch(OutputPerpLinearDownName,&uPerpLinearDown,OutputPerpLinearDownName+"/F");
+  TBranch *uParaLinearDownBr = outTree->Branch(OutputParaLinearDownName,&uParaLinearDown,OutputParaLinearDownName+"/F");
+  TBranch *uMagLinearDownBr  = outTree->Branch(OutputRecoilPtLinearDownName,&uMagLinearDown,OutputRecoilPtLinearDownName+"/F");
+  TBranch *uPerpQuadUpBr = outTree->Branch(OutputPerpQuadUpName,&uPerpQuadUp,OutputPerpQuadUpName+"/F");
+  TBranch *uParaQuadUpBr = outTree->Branch(OutputParaQuadUpName,&uParaQuadUp,OutputParaQuadUpName+"/F");
+  TBranch *uMagQuadUpBr  = outTree->Branch(OutputRecoilPtQuadUpName,&uMagQuadUp,OutputRecoilPtQuadUpName+"/F");
+  TBranch *uPerpQuadDownBr = outTree->Branch(OutputPerpQuadDownName,&uPerpQuadDown,OutputPerpQuadDownName+"/F");
+  TBranch *uParaQuadDownBr = outTree->Branch(OutputParaQuadDownName,&uParaQuadDown,OutputParaQuadDownName+"/F");
+  TBranch *uMagQuadDownBr  = outTree->Branch(OutputRecoilPtQuadDownName,&uMagQuadDown,OutputRecoilPtQuadDownName+"/F");
 
   int lastPdgId = 0;
 
@@ -240,6 +276,24 @@ void applicatorOnlyBranches(TString outDir,
       }
       uMagFootUp = TMath::Sqrt(uPerp*uPerp + uParaFootUp*uParaFootUp);
       uMagFootDown = TMath::Sqrt(uPerp*uPerp + uParaFootDown*uParaFootDown);
+
+      uPerpLinearUp = uPerpResolutionUp;
+      uParaLinearUp = uParaResolutionUp + uParaFootUp + uParaScaleUp - 2*uPara;
+      uMagLinearUp = TMath::Sqrt(uPerpLinearUp*uPerpLinearUp + uParaLinearUp*uParaLinearUp);
+      uPerpLinearDown = uPerpResolutionDown;
+      uParaLinearDown = uParaResolutionDown + uParaFootDown + uParaScaleDown - 2*uPara;
+      uMagLinearDown = TMath::Sqrt(uPerpLinearDown*uPerpLinearDown + uParaLinearDown*uParaLinearDown);
+
+      uPerpQuadUp = uPerpResolutionUp;
+      uParaQuadUp = uPara - TMath::Sqrt((uParaResolutionUp - uPara) * (uParaResolutionUp - uPara) +
+                                        (uParaFootUp - uPara) * (uParaFootUp - uPara) +
+                                        (uParaScaleUp - uPara) * (uParaScaleUp - uPara));
+      uMagQuadUp = TMath::Sqrt(uPerpQuadUp*uPerpQuadUp + uParaQuadUp*uParaQuadUp);
+      uPerpQuadDown = uPerpResolutionDown;
+      uParaQuadDown = uPara + TMath::Sqrt((uParaResolutionDown - uPara) * (uParaResolutionDown - uPara) +
+                                        (uParaFootDown - uPara) * (uParaFootDown - uPara) +
+                                        (uParaScaleDown - uPara) * (uParaScaleDown - uPara));
+      uMagQuadDown = TMath::Sqrt(uPerpQuadDown*uPerpQuadDown + uParaQuadDown*uParaQuadDown);
     }
     else {
       uPerp = 300;
@@ -259,6 +313,18 @@ void applicatorOnlyBranches(TString outDir,
       uMagFootUp  = -5;
       uParaFootDown = 300;
       uMagFootDown  = -5;
+      uPerpLinearUp = 300;
+      uParaLinearUp = 300;
+      uMagLinearUp  = -5;
+      uPerpLinearDown = 300;
+      uParaLinearDown = 300;
+      uMagLinearDown  = -5;
+      uPerpQuadUp = 300;
+      uParaQuadUp = 300;
+      uMagQuadUp  = -5;
+      uPerpQuadDown = 300;
+      uParaQuadDown = 300;
+      uMagQuadDown  = -5;
     }
 
     if (inTree == outTree) {
@@ -279,6 +345,18 @@ void applicatorOnlyBranches(TString outDir,
       uMagFootUpBr->Fill();
       uParaFootDownBr->Fill();
       uMagFootDownBr->Fill();
+      uPerpLinearUpBr->Fill();
+      uParaLinearUpBr->Fill();
+      uMagLinearUpBr->Fill();
+      uPerpLinearDownBr->Fill();
+      uParaLinearDownBr->Fill();
+      uMagLinearDownBr->Fill();
+      uPerpQuadUpBr->Fill();
+      uParaQuadUpBr->Fill();
+      uMagQuadUpBr->Fill();
+      uPerpQuadDownBr->Fill();
+      uParaQuadDownBr->Fill();
+      uMagQuadDownBr->Fill();
     }
     else
       outTree->Fill();
