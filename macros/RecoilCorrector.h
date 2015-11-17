@@ -71,7 +71,7 @@ public:
   void LoadAllFits(TFile*);
 
   // computations
-  double GetError(double,RecoilType,UType,Parameter,ChannelNum) const;
+  double GetError(float,RecoilType,UType,Parameter,ChannelNum) const;
   void ComputeU(float genpt, float& u1, float& u1ScUp, float& u1ScDown, float& u1ResUp, float& u1ResDown, 
                 float& u2, float& u2ResUp, float& u2ResDown) const;
   /* void CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met, float& metScUp, float& metScDown, */

@@ -148,7 +148,7 @@ void RecoilCorrector::LoadAllFits(TFile *fIn) {
   } // loop over recoil types
 }
 
-double RecoilCorrector::GetError(double x,RecoilType r,UType u,Parameter p,ChannelNum c) const {
+double RecoilCorrector::GetError(float x,RecoilType r,UType u,Parameter p,ChannelNum c) const {
   TMatrixDSym *cov = 0;
   double *xx = 0;
   switch (p) {
@@ -175,9 +175,9 @@ double RecoilCorrector::GetError(double x,RecoilType r,UType u,Parameter p,Chann
   }
 
   unsigned int dim = cov->GetNrows(); 
-  
-  for (unsigned int iR=0; iR!=dim; ++dim) 
-    xx[iR] = TMath::Power(x,(Int_t)iR);
+
+  for (unsigned int iR=0; iR!=dim; ++iR)
+    xx[iR] = TMath::Power(x,int(iR));
 
   double error=0;
   for (unsigned int iR=0; iR!=dim; ++iR) {
