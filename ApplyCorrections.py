@@ -32,21 +32,24 @@ GenBosonPtExpression    = config.get('InputExpressions','GenBosonPtExpression')
 GenBosonPdgIdExpression = config.get('InputExpressions','GenBosonPdgIdExpression')
 DaughterPdgIdExpression = config.get('InputExpressions','DaughterPdgIdExpression')
 EventNumExpression      = config.get('InputExpressions','EventNumExpression')
-OutputPhotonPt      = config.get('OutputBranches','OutputPhotonPt')
-OutputPhotonSysUp   = config.get('OutputBranches','OutputPhotonSysUp')
-OutputPhotonSysDown = config.get('OutputBranches','OutputPhotonSysDown')
-OutputZPt      = config.get('OutputBranches','OutputZPt')
-OutputZSysUp   = config.get('OutputBranches','OutputZSysUp')
-OutputZSysDown = config.get('OutputBranches','OutputZSysDown')
+
 OutputPerpName      = config.get('OutputBranches','OutputPerpName')
 OutputParaName      = config.get('OutputBranches','OutputParaName')
 OutputRecoilPtName  = config.get('OutputBranches','OutputRecoilPtName')
-OutputPerpUpName      = config.get('OutputBranches','OutputPerpUpName')
-OutputParaUpName      = config.get('OutputBranches','OutputParaUpName')
-OutputRecoilPtUpName  = config.get('OutputBranches','OutputRecoilPtUpName')
-OutputPerpDownName      = config.get('OutputBranches','OutputPerpDownName')
-OutputParaDownName      = config.get('OutputBranches','OutputParaDownName')
-OutputRecoilPtDownName  = config.get('OutputBranches','OutputRecoilPtDownName')
+OutputParaScaleUpName      = config.get('OutputBranches','OutputParaScaleUpName')
+OutputRecoilPtScaleUpName  = config.get('OutputBranches','OutputRecoilPtScaleUpName')
+OutputParaScaleDownName      = config.get('OutputBranches','OutputParaScaleDownName')
+OutputRecoilPtScaleDownName  = config.get('OutputBranches','OutputRecoilPtScaleDownName')
+OutputPerpResolutionUpName      = config.get('OutputBranches','OutputPerpResolutionUpName')
+OutputParaResolutionUpName      = config.get('OutputBranches','OutputParaResolutionUpName')
+OutputRecoilPtResolutionUpName  = config.get('OutputBranches','OutputRecoilPtResolutionUpName')
+OutputPerpResolutionDownName      = config.get('OutputBranches','OutputPerpResolutionDownName')
+OutputParaResolutionDownName      = config.get('OutputBranches','OutputParaResolutionDownName')
+OutputRecoilPtResolutionDownName  = config.get('OutputBranches','OutputRecoilPtResolutionDownName')
+OutputParaFootUpName      = config.get('OutputBranches','OutputParaFootUpName')
+OutputRecoilPtFootUpName  = config.get('OutputBranches','OutputRecoilPtFootUpName')
+OutputParaFootDownName      = config.get('OutputBranches','OutputParaFootDownName')
+OutputRecoilPtFootDownName  = config.get('OutputBranches','OutputRecoilPtFootDownName')
 reportFreq  = int(config.get('Misc','ReportFrequency'))
 
 if config.has_option('InputExpressions','MacrosToLoad'):
@@ -72,7 +75,7 @@ else:
 
 sqrt = ROOT.TMath.Sqrt
 
-phoCorrections = ROOT.TFile("FootprintFits.root")
+phoCorrections = ROOT.TFile("data/FootprintFits.root")
 ZmmFunc = phoCorrections.Get("mu_Zmm_Data")
 ZmmFuncUp = phoCorrections.Get("mu_up_Zmm_Data")
 ZmmFuncDown = phoCorrections.Get("mu_down_Zmm_Data")
@@ -84,26 +87,28 @@ GJetsFuncUp = phoCorrections.Get("mu_up_gjets_Data")
 GJetsFuncDown = phoCorrections.Get("mu_down_gjets_Data")
 
 branchesCheck = [
-    OutputPhotonPt,
-    OutputPhotonSysUp,
-    OutputPhotonSysDown,
-    OutputZPt,
-    OutputZSysUp,
-    OutputZSysDown,
     OutputPerpName,
     OutputParaName,
     OutputRecoilPtName,
-    OutputPerpUpName,
-    OutputParaUpName,
-    OutputRecoilPtUpName,
-    OutputPerpDownName,
-    OutputParaDownName,
-    OutputRecoilPtDownName,
+    OutputParaScaleUpName,
+    OutputRecoilPtScaleUpName,
+    OutputParaScaleDownName,
+    OutputRecoilPtScaleDownName,
+    OutputPerpResolutionUpName,
+    OutputParaResolutionUpName,
+    OutputRecoilPtResolutionUpName,
+    OutputPerpResolutionDownName,
+    OutputParaResolutionDownName,
+    OutputRecoilPtResolutionDownName,
+    OutputParaFootUpName,
+    OutputRecoilPtFootUpName,
+    OutputParaFootDownName,
+    OutputRecoilPtFootDownName
 ]
 
 def ApplyCorrection(inQueue):
     running = True
-    smearingCorrections = ROOT.TFile("SmearingFits.root")
+    smearingCorrections = ROOT.TFile("data/SmearingFits.root")
     rc = ROOT.RecoilCorrector()
     rc.SetInputName("Zmm")
     rc.LoadAllFits(smearingCorrections)
@@ -124,21 +129,23 @@ def ApplyCorrection(inQueue):
                 GenBosonPdgIdExpression,
                 DaughterPdgIdExpression,
                 EventNumExpression,
-                OutputPhotonPt,
-                OutputPhotonSysUp,
-                OutputPhotonSysDown,
-                OutputZPt,
-                OutputZSysUp,
-                OutputZSysDown,
                 OutputPerpName,
                 OutputParaName,
                 OutputRecoilPtName,
-                OutputPerpUpName,
-                OutputParaUpName,
-                OutputRecoilPtUpName,
-                OutputPerpDownName,
-                OutputParaDownName,
-                OutputRecoilPtDownName,
+                OutputParaScaleUpName,
+                OutputRecoilPtScaleUpName,
+                OutputParaScaleDownName,
+                OutputRecoilPtScaleDownName,
+                OutputPerpResolutionUpName,
+                OutputParaResolutionUpName,
+                OutputRecoilPtResolutionUpName,
+                OutputPerpResolutionDownName,
+                OutputParaResolutionDownName,
+                OutputRecoilPtResolutionDownName,
+                OutputParaFootUpName,
+                OutputRecoilPtFootUpName,
+                OutputParaFootDownName,
+                OutputRecoilPtFootDownName,
                 ZmmFunc,
                 ZmmFuncUp,
                 ZmmFuncDown,

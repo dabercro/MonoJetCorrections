@@ -19,21 +19,23 @@ void applicatorOnlyBranches(TString outDir,
                             TString GenBosonPdgIdExpression,
                             TString DaughterPdgIdExpression,
                             TString EventNumExpression,
-                            TString OutputPhotonPt,
-                            TString OutputPhotonSysUp,
-                            TString OutputPhotonSysDown,
-                            TString OutputZPt,
-                            TString OutputZSysUp,
-                            TString OutputZSysDown,
                             TString OutputPerpName,
                             TString OutputParaName,
                             TString OutputRecoilPtName,
-                            TString OutputPerpUpName,
-                            TString OutputParaUpName,
-                            TString OutputRecoilPtUpName,
-                            TString OutputPerpDownName,
-                            TString OutputParaDownName,
-                            TString OutputRecoilPtDownName,
+                            TString OutputParaScaleUpName,
+                            TString OutputRecoilPtScaleUpName,
+                            TString OutputParaScaleDownName,
+                            TString OutputRecoilPtScaleDownName,
+                            TString OutputPerpResolutionUpName,
+                            TString OutputParaResolutionUpName,
+                            TString OutputRecoilPtResolutionUpName,
+                            TString OutputPerpResolutionDownName,
+                            TString OutputParaResolutionDownName,
+                            TString OutputRecoilPtResolutionDownName,
+                            TString OutputParaFootUpName,
+                            TString OutputRecoilPtFootUpName,
+                            TString OutputParaFootDownName,
+                            TString OutputRecoilPtFootDownName,
                             TF1* ZmmFunc,
                             TF1* ZmmFuncUp,
                             TF1* ZmmFuncDown,
@@ -105,38 +107,41 @@ void applicatorOnlyBranches(TString outDir,
   TBranch *eventNumF      = inTree->GetBranch(EventNumExpression);
   eventNumF->SetAddress(&eventNum);
 
-  float footPt = 0;
-  float footUp = 0;
-  float footDown = 0;
-  float ZfootPt = 0;
-  float ZfootUp = 0;
-  float ZfootDown = 0;
   float uPerp = 0;
   float uPara = 0;
   float uMag = 0;
-  float uPerpUp = 0;
-  float uParaUp = 0;
-  float uMagUp = 0;
-  float uPerpDown = 0;
-  float uParaDown = 0;
-  float uMagDown = 0;
-
-  TBranch *footPtBr    = outTree->Branch(OutputPhotonPt,&footPt,OutputPhotonPt+"/F");
-  TBranch *footUpBr    = outTree->Branch(OutputPhotonSysUp,&footUp,OutputPhotonSysUp+"/F");
-  TBranch *footDownBr  = outTree->Branch(OutputPhotonSysDown,&footDown,OutputPhotonSysDown+"/F");
-  TBranch *ZfootPtBr   = outTree->Branch(OutputZPt,&ZfootPt,OutputZPt+"/F");
-  TBranch *ZfootUpBr   = outTree->Branch(OutputZSysUp,&ZfootUp,OutputZSysUp+"/F");
-  TBranch *ZfootDownBr = outTree->Branch(OutputZSysDown,&ZfootDown,OutputZSysDown+"/F");
+  float uParaScaleUp = 0;
+  float uMagScaleUp = 0;
+  float uParaScaleDown = 0;
+  float uMagScaleDown = 0;
+  float uPerpResolutionUp = 0;
+  float uParaResolutionUp = 0;
+  float uMagResolutionUp = 0;
+  float uPerpResolutionDown = 0;
+  float uParaResolutionDown = 0;
+  float uMagResolutionDown = 0;
+  float uParaFootUp = 0;
+  float uMagFootUp = 0;
+  float uParaFootDown = 0;
+  float uMagFootDown = 0;
 
   TBranch *uPerpBr = outTree->Branch(OutputPerpName,&uPerp,OutputPerpName+"/F");
   TBranch *uParaBr = outTree->Branch(OutputParaName,&uPara,OutputParaName+"/F");
   TBranch *uMagBr  = outTree->Branch(OutputRecoilPtName,&uMag,OutputRecoilPtName+"/F");
-  TBranch *uPerpUpBr = outTree->Branch(OutputPerpUpName,&uPerpUp,OutputPerpUpName+"/F");
-  TBranch *uParaUpBr = outTree->Branch(OutputParaUpName,&uParaUp,OutputParaUpName+"/F");
-  TBranch *uMagUpBr  = outTree->Branch(OutputRecoilPtUpName,&uMagUp,OutputRecoilPtUpName+"/F");
-  TBranch *uPerpDownBr = outTree->Branch(OutputPerpDownName,&uPerpDown,OutputPerpDownName+"/F");
-  TBranch *uParaDownBr = outTree->Branch(OutputParaDownName,&uParaDown,OutputParaDownName+"/F");
-  TBranch *uMagDownBr  = outTree->Branch(OutputRecoilPtDownName,&uMagDown,OutputRecoilPtDownName+"/F");
+  TBranch *uParaScaleUpBr = outTree->Branch(OutputParaScaleUpName,&uParaScaleUp,OutputParaScaleUpName+"/F");
+  TBranch *uMagScaleUpBr  = outTree->Branch(OutputRecoilPtScaleUpName,&uMagScaleUp,OutputRecoilPtScaleUpName+"/F");
+  TBranch *uParaScaleDownBr = outTree->Branch(OutputParaScaleDownName,&uParaScaleDown,OutputParaScaleDownName+"/F");
+  TBranch *uMagScaleDownBr  = outTree->Branch(OutputRecoilPtScaleDownName,&uMagScaleDown,OutputRecoilPtScaleDownName+"/F");
+  TBranch *uPerpResolutionUpBr = outTree->Branch(OutputPerpResolutionUpName,&uPerpResolutionUp,OutputPerpResolutionUpName+"/F");
+  TBranch *uParaResolutionUpBr = outTree->Branch(OutputParaResolutionUpName,&uParaResolutionUp,OutputParaResolutionUpName+"/F");
+  TBranch *uMagResolutionUpBr  = outTree->Branch(OutputRecoilPtResolutionUpName,&uMagResolutionUp,OutputRecoilPtResolutionUpName+"/F");
+  TBranch *uPerpResolutionDownBr = outTree->Branch(OutputPerpResolutionDownName,&uPerpResolutionDown,OutputPerpResolutionDownName+"/F");
+  TBranch *uParaResolutionDownBr = outTree->Branch(OutputParaResolutionDownName,&uParaResolutionDown,OutputParaResolutionDownName+"/F");
+  TBranch *uMagResolutionDownBr  = outTree->Branch(OutputRecoilPtResolutionDownName,&uMagResolutionDown,OutputRecoilPtResolutionDownName+"/F");
+  TBranch *uParaFootUpBr = outTree->Branch(OutputParaFootUpName,&uParaFootUp,OutputParaFootUpName+"/F");
+  TBranch *uMagFootUpBr  = outTree->Branch(OutputRecoilPtFootUpName,&uMagFootUp,OutputRecoilPtFootUpName+"/F");
+  TBranch *uParaFootDownBr = outTree->Branch(OutputParaFootDownName,&uParaFootDown,OutputParaFootDownName+"/F");
+  TBranch *uMagFootDownBr  = outTree->Branch(OutputRecoilPtFootDownName,&uMagFootDown,OutputRecoilPtFootDownName+"/F");
 
   int lastPdgId = 0;
 
@@ -144,6 +149,13 @@ void applicatorOnlyBranches(TString outDir,
   for (int entry = 0; entry != numEntries; ++entry) {
     if (entry % reportFreq == 0)
       std::cout <<  "Processing " << inFileName << " ... " << float(entry)/numEntries * 100 << "%" << std::endl;
+
+    double footPt = 0.;
+    double footUp = 0.;
+    double footDown = 0.;
+    double ZfootPt = 0.;
+    double ZfootUp = 0.;
+    double ZfootDown = 0.;
 
     photonPtF->GetEntry(entry);
     ZPtF->GetEntry(entry);
@@ -153,10 +165,10 @@ void applicatorOnlyBranches(TString outDir,
     eventNumF->GetEntry(entry);
 
     if (photonPt > 1000 || photonPt < 0) {
-        footPt   = photonPt;
-        footUp   = photonPt;
-        footDown = photonPt;
-      }
+      footPt   = photonPt;
+      footUp   = photonPt;
+      footDown = photonPt;
+    }
     else {
       double mmFuncVal  = ZmmFunc->Eval(photonPt);
       double mmUpErr2   = ZmmFuncUp->Eval(photonPt) - ZmmFunc->Eval(photonPt);
@@ -184,9 +196,9 @@ void applicatorOnlyBranches(TString outDir,
       double eeUpErr2   = ZeeFuncUp->Eval(photonPt) - ZeeFunc->Eval(photonPt);
       double eeDownErr2 = ZeeFunc->Eval(photonPt) - ZeeFuncDown->Eval(photonPt);
 
-      footPt   = ZPt + (mmFuncVal - eeFuncVal)/(1 - ZmmFunc->GetParameter(1));
-      footUp   = ZPt + (mmFuncVal - eeFuncVal + sqrt(mmUpErr2 + eeDownErr2))/(1 - ZmmFuncUp->GetParameter(1) - 2*ZmmFuncUp->GetParameter(2)*ZPt);
-      footDown = ZPt + (mmFuncVal - eeFuncVal - sqrt(mmDownErr2 + eeUpErr2))/(1 - ZmmFuncDown->GetParameter(1) - 2*ZmmFuncDown->GetParameter(2)*ZPt);
+      ZfootPt   = ZPt + (mmFuncVal - eeFuncVal)/(1 - ZmmFunc->GetParameter(1));
+      ZfootUp   = ZPt + (mmFuncVal - eeFuncVal + sqrt(mmUpErr2 + eeDownErr2))/(1 - ZmmFuncUp->GetParameter(1) - 2*ZmmFuncUp->GetParameter(2)*ZPt);
+      ZfootDown = ZPt + (mmFuncVal - eeFuncVal - sqrt(mmDownErr2 + eeUpErr2))/(1 - ZmmFuncDown->GetParameter(1) - 2*ZmmFuncDown->GetParameter(2)*ZPt);
     }
 
     rc->SetSeed(eventNum);
@@ -211,41 +223,62 @@ void applicatorOnlyBranches(TString outDir,
             rc->SetOutput(RecoilCorrector::kWmn);
         }
       }
-      rc->ComputeU(genBosPt,uPerp,uPara);
-      rc->ComputeU(genBosPt,uPerpUp,uParaUp,1.0);
-      rc->ComputeU(genBosPt,uPerpDown,uParaDown,-1.0);
+      rc->ComputeU(genBosPt,uPara,uParaScaleUp,uParaScaleDown,uParaResolutionUp,uParaResolutionDown,
+                   uPerp,uPerpResolutionUp,uPerpResolutionDown);
       uMag = TMath::Sqrt(uPerp*uPerp + uPara*uPara);
-      uMagUp = TMath::Sqrt(uPerpUp*uPerpUp + uParaUp*uParaUp);
-      uMagDown = TMath::Sqrt(uPerpDown*uPerpDown + uParaDown*uParaDown);
+      uMagScaleUp = TMath::Sqrt(uPerp*uPerp + uParaScaleUp*uParaScaleUp);
+      uMagScaleDown = TMath::Sqrt(uPerp*uPerp + uParaScaleDown*uParaScaleDown);
+      uMagResolutionUp = TMath::Sqrt(uPerpResolutionUp*uPerpResolutionUp + uParaResolutionUp*uParaResolutionUp);
+      uMagResolutionDown = TMath::Sqrt(uPerpResolutionDown*uPerpResolutionDown + uParaResolutionDown*uParaResolutionDown);
+      if ((ZfootUp - ZfootDown) > (footUp - footDown)) {
+        uParaFootUp = uPara - ZfootUp + ZfootPt;
+        uParaFootDown = uPara - ZfootDown + ZfootPt;
+      }
+      else {
+        uParaFootUp = uPara - footUp + footPt;
+        uParaFootDown = uPara - footDown + footPt;
+      }
+      uMagFootUp = TMath::Sqrt(uPerp*uPerp + uParaFootUp*uParaFootUp);
+      uMagFootDown = TMath::Sqrt(uPerp*uPerp + uParaFootDown*uParaFootDown);
     }
     else {
       uPerp = 300;
       uPara = 300;
       uMag  = -5;
-      uPerpUp = 300;
-      uParaUp = 300;
-      uMagUp  = -5;
-      uPerpDown = 300;
-      uParaDown = 300;
-      uMagDown  = -5;
+      uParaScaleUp = 300;
+      uMagScaleUp  = -5;
+      uParaScaleDown = 300;
+      uMagScaleDown  = -5;
+      uPerpResolutionUp = 300;
+      uParaResolutionUp = 300;
+      uMagResolutionUp  = -5;
+      uPerpResolutionDown = 300;
+      uParaResolutionDown = 300;
+      uMagResolutionDown  = -5;
+      uParaFootUp = 300;
+      uMagFootUp  = -5;
+      uParaFootDown = 300;
+      uMagFootDown  = -5;
     }
 
     if (inTree == outTree) {
-      footPtBr->Fill();
-      footUpBr->Fill();
-      footDownBr->Fill();
-      ZfootPtBr->Fill();
-      ZfootUpBr->Fill();
-      ZfootDownBr->Fill();
       uPerpBr->Fill();
       uParaBr->Fill();
       uMagBr->Fill();
-      uPerpUpBr->Fill();
-      uParaUpBr->Fill();
-      uMagUpBr->Fill();
-      uPerpDownBr->Fill();
-      uParaDownBr->Fill();
-      uMagDownBr->Fill();
+      uParaScaleUpBr->Fill();
+      uMagScaleUpBr->Fill();
+      uParaScaleDownBr->Fill();
+      uMagScaleDownBr->Fill();
+      uPerpResolutionUpBr->Fill();
+      uParaResolutionUpBr->Fill();
+      uMagResolutionUpBr->Fill();
+      uPerpResolutionDownBr->Fill();
+      uParaResolutionDownBr->Fill();
+      uMagResolutionDownBr->Fill();
+      uParaFootUpBr->Fill();
+      uMagFootUpBr->Fill();
+      uParaFootDownBr->Fill();
+      uMagFootDownBr->Fill();
     }
     else
       outTree->Fill();

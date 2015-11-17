@@ -190,7 +190,9 @@ double RecoilCorrector::GetError(double x,RecoilType r,UType u,Parameter p,Chann
   return TMath::Sqrt(error);
 }
 
-void RecoilCorrector::ComputeU(float genpt, float &u1, float &u2, float nsigma/*=0*/) const {
+void RecoilCorrector::ComputeU(float genpt, 
+                               float &u1, float &u1ScUp, float &u1ScDown, float &u1ResUp, float &u1ResDown,
+                               float &u2, float &u2ResUp, float &u2ResDown) const {
   
   // first compute u1
   //double mu     = (fmu[kU1][kDataIn][0]->Eval(genpt))     * (fmu[kU1][kMCOut][fCurrChannel]->Eval(genpt))     / (fmu[kU1][kMCIn][0]->Eval(genpt));
@@ -198,55 +200,101 @@ void RecoilCorrector::ComputeU(float genpt, float &u1, float &u2, float nsigma/*
   double sigma1 = fsigma1[kU1][kDataIn][0]->Eval(genpt) * fsigma1[kU1][kMCOut][fCurrChannel]->Eval(genpt) / fsigma1[kU1][kMCIn][0]->Eval(genpt);
   double sigma2 = fsigma2[kU1][kDataIn][0]->Eval(genpt) * fsigma2[kU1][kMCOut][fCurrChannel]->Eval(genpt) / fsigma2[kU1][kMCIn][0]->Eval(genpt);
   double sigma  = fsigma[kU1][kDataIn][0]->Eval(genpt)  * fsigma[kU1][kMCOut][fCurrChannel]->Eval(genpt)  / fsigma[kU1][kMCIn][0]->Eval(genpt);
-  double sigmaSingle  = fsigmaSingle[kU1][kDataIn][0]->Eval(genpt)  * fsigmaSingle[kU1][kMCOut][fCurrChannel]->Eval(genpt)  / fsigmaSingle[kU1][kMCIn][0]->Eval(genpt);
 
   // a la error propogation used in w/z analaysis
   // TODO: improve to treat parameters independently
   // currently making conservative assumption of maximal correlation
-  if (nsigma != 0.) {
-    mu     += nsigma * GetError(genpt,kMCOut,kU1,kMu,fCurrChannel)     * (fmu[kU1][kDataIn][0]->Eval(genpt)-genpt) / (fmu[kU1][kMCIn][0]->Eval(genpt) - genpt);
-    sigma1 += nsigma * GetError(genpt,kMCOut,kU1,kSigma1,fCurrChannel) * fsigma1[kU1][kDataIn][0]->Eval(genpt) / fsigma1[kU1][kMCIn][0]->Eval(genpt); 
-    sigma2 += nsigma * GetError(genpt,kMCOut,kU1,kSigma2,fCurrChannel) * fsigma2[kU1][kDataIn][0]->Eval(genpt) / fsigma2[kU1][kMCIn][0]->Eval(genpt);
-    sigma  += nsigma * GetError(genpt,kMCOut,kU1,kSigma,fCurrChannel)  * fsigma[kU1][kDataIn][0]->Eval(genpt)  / fsigma[kU1][kMCIn][0]->Eval(genpt);
-    sigmaSingle  += nsigma * GetError(genpt,kMCOut,kU1,kSigmaSingle,fCurrChannel)  * fsigmaSingle[kU1][kDataIn][0]->Eval(genpt)  / fsigmaSingle[kU1][kMCIn][0]->Eval(genpt);
-  }
+
+  double muSig     = GetError(genpt,kMCOut,kU1,kMu,fCurrChannel)     * (fmu[kU1][kDataIn][0]->Eval(genpt)-genpt) / (fmu[kU1][kMCIn][0]->Eval(genpt) - genpt);
+  muSig = fabs(muSig);
+  // double sigma1Sig = GetError(genpt,kMCOut,kU1,kSigma1,fCurrChannel) * fsigma1[kU1][kDataIn][0]->Eval(genpt) / fsigma1[kU1][kMCIn][0]->Eval(genpt); 
+  // double sigma2Sig = GetError(genpt,kMCOut,kU1,kSigma2,fCurrChannel) * fsigma2[kU1][kDataIn][0]->Eval(genpt) / fsigma2[kU1][kMCIn][0]->Eval(genpt);
+  // double sigmaSig  = GetError(genpt,kMCOut,kU1,kSigma,fCurrChannel)  * fsigma[kU1][kDataIn][0]->Eval(genpt)  / fsigma[kU1][kMCIn][0]->Eval(genpt);
 
   double frac = (sigma-sigma2)/(sigma1-sigma2);
 
-  if (fSingleGaus)
-    u1 = rng->Gaus(mu,sigmaSingle);
-  else
-    u1 = (((rng->Uniform(0,1)<frac) ? rng->Gaus(mu,sigma1) : rng->Gaus(mu,sigma2)));
+  double laSigma = 0;
+  double laSigmaSig = 0;
+
+  if (rng->Uniform(0,1)<frac) {
+    laSigma = sigma1;
+    laSigmaSig = GetError(genpt,kMCOut,kU1,kSigma1,fCurrChannel) * fsigma1[kU1][kDataIn][0]->Eval(genpt) / fsigma1[kU1][kMCIn][0]->Eval(genpt); 
+  }
+  else {
+    laSigma = sigma2;
+    laSigmaSig = GetError(genpt,kMCOut,kU1,kSigma2,fCurrChannel) * fsigma1[kU1][kDataIn][0]->Eval(genpt) / fsigma2[kU1][kMCIn][0]->Eval(genpt); 
+  }
+
+  double anotherUni = rng->Uniform(-1,1);
+  if (anotherUni == 0) {
+    u1 = mu;
+    u1ScUp = mu;
+    u1ScDown = mu;
+    u1ResUp = mu;
+    u1ResDown = mu;
+  }
+  else {
+    u1       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfcInverse(fabs(anotherUni));
+    u1ScUp   = u1 + muSig;
+    u1ScDown = u1 - muSig;
+    u1ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    u1ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    if (fabs(u1ResDown) > fabs(u1ResUp)) {  // Swap them if toy on negative tail of Gaussian
+      double temp = u1ResUp;
+      u1ResUp = u1ResDown;
+      u1ResDown = temp;
+    }
+  }
 
   // now compute u2
   mu     = fmu[kU2][kDataIn][0]->Eval(genpt)     * fmu[kU2][kMCOut][fCurrChannel]->Eval(genpt)     / fmu[kU2][kMCIn][0]->Eval(genpt);
   sigma1 = fsigma1[kU2][kDataIn][0]->Eval(genpt) * fsigma1[kU2][kMCOut][fCurrChannel]->Eval(genpt) / fsigma1[kU2][kMCIn][0]->Eval(genpt);
   sigma2 = fsigma2[kU2][kDataIn][0]->Eval(genpt) * fsigma2[kU2][kMCOut][fCurrChannel]->Eval(genpt) / fsigma2[kU2][kMCIn][0]->Eval(genpt);
   sigma  = fsigma[kU2][kDataIn][0]->Eval(genpt)  * fsigma[kU2][kMCOut][fCurrChannel]->Eval(genpt)  / fsigma[kU2][kMCIn][0]->Eval(genpt);
-  sigmaSingle  = fsigmaSingle[kU2][kDataIn][0]->Eval(genpt)  * fsigmaSingle[kU2][kMCOut][fCurrChannel]->Eval(genpt)  / fsigmaSingle[kU2][kMCIn][0]->Eval(genpt);
   
-  if (nsigma != 0.) {
-    mu     += nsigma * GetError(genpt,kMCOut,kU2,kMu,fCurrChannel)     * fmu[kU2][kDataIn][0]->Eval(genpt)     / fmu[kU2][kMCIn][0]->Eval(genpt);
-    sigma1 += nsigma * GetError(genpt,kMCOut,kU2,kSigma1,fCurrChannel) * fsigma1[kU2][kDataIn][0]->Eval(genpt) / fsigma1[kU2][kMCIn][0]->Eval(genpt); 
-    sigma2 += nsigma * GetError(genpt,kMCOut,kU2,kSigma2,fCurrChannel) * fsigma2[kU2][kDataIn][0]->Eval(genpt) / fsigma2[kU2][kMCIn][0]->Eval(genpt);
-    sigma  += nsigma * GetError(genpt,kMCOut,kU2,kSigma,fCurrChannel)  * fsigma[kU2][kDataIn][0]->Eval(genpt)  / fsigma[kU2][kMCIn][0]->Eval(genpt);
-    sigmaSingle  += nsigma * GetError(genpt,kMCOut,kU2,kSigmaSingle,fCurrChannel)  * fsigmaSingle[kU2][kDataIn][0]->Eval(genpt)  / fsigmaSingle[kU2][kMCIn][0]->Eval(genpt);
-  }
-
+  // muSig = GetError(genpt,kMCOut,kU2,kMu,fCurrChannel)     * fmu[kU2][kDataIn][0]->Eval(genpt)     / fmu[kU2][kMCIn][0]->Eval(genpt);
+  muSig = 0;
+  // sigma1Sig = GetError(genpt,kMCOut,kU2,kSigma1,fCurrChannel) * fsigma1[kU2][kDataIn][0]->Eval(genpt) / fsigma1[kU2][kMCIn][0]->Eval(genpt); 
+  // sigma2Sig = GetError(genpt,kMCOut,kU2,kSigma2,fCurrChannel) * fsigma2[kU2][kDataIn][0]->Eval(genpt) / fsigma2[kU2][kMCIn][0]->Eval(genpt);
+  // sigmaSig  = GetError(genpt,kMCOut,kU2,kSigma,fCurrChannel)  * fsigma[kU2][kDataIn][0]->Eval(genpt)  / fsigma[kU2][kMCIn][0]->Eval(genpt);
+  
   frac = (sigma-sigma2)/(sigma1-sigma2);
 
-  if (fSingleGaus)
-    u2 = rng->Gaus(mu,sigmaSingle);
-  else
-    u2 = (rng->Uniform(0,1)<frac) ? rng->Gaus(mu,sigma1) : rng->Gaus(mu,sigma2);
+  if (rng->Uniform(0,1)<frac) {
+    laSigma = sigma1;
+    laSigmaSig = GetError(genpt,kMCOut,kU2,kSigma1,fCurrChannel) * fsigma1[kU2][kDataIn][0]->Eval(genpt) / fsigma1[kU2][kMCIn][0]->Eval(genpt); 
+  }
+  else {
+    laSigma = sigma2;
+    laSigmaSig = GetError(genpt,kMCOut,kU2,kSigma2,fCurrChannel) * fsigma1[kU2][kDataIn][0]->Eval(genpt) / fsigma2[kU2][kMCIn][0]->Eval(genpt); 
+  }
+
+  anotherUni = rng->Uniform(-1,1);
+  if (anotherUni == 0) {
+    u2 = mu;
+    u2ResUp = mu;
+    u2ResDown = mu;
+  }
+  else {
+    u2       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfcInverse(fabs(anotherUni));
+    u2ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    u2ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    if (fabs(u2ResDown) > fabs(u2ResUp)) {  // This will probably happen a lot less often
+      double temp = u2ResUp;
+      u2ResUp = u2ResDown;
+      u2ResDown = temp;
+    }
+  }
 }
 
-void RecoilCorrector::CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met,float& metphi, float nsigma, float u1, float u2) const {
-  if (u1==-999||u2==-999)
-    ComputeU(genpt,u1,u2,nsigma);
-  TVector2 vLep(leppt*TMath::Cos(lepphi),leppt*TMath::Sin(lepphi));
-  TVector2 vU(u1*TMath::Cos(genphi)-u2*TMath::Sin(genphi),u1*TMath::Sin(genphi)+u2*TMath::Cos(genphi));
-  TVector2 vMissingEnergy = -1*(vLep+vU);
-  met = vMissingEnergy.Mod();
-  metphi = vMissingEnergy.Phi();
-}
+// void RecoilCorrector::CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met, float& metScUp, float& metScDown,
+//                                  float& metResUp, float& metResDown,
+//                                  float& metphi, float nsigma, float u1, float u2) const {
+//   if (u1==-999||u2==-999)
+//     ComputeU(genpt,u1,u2,nsigma);
+//   TVector2 vLep(leppt*TMath::Cos(lepphi),leppt*TMath::Sin(lepphi));
+//   TVector2 vU(u1*TMath::Cos(genphi)-u2*TMath::Sin(genphi),u1*TMath::Sin(genphi)+u2*TMath::Cos(genphi));
+//   TVector2 vMissingEnergy = -1*(vLep+vU);
+//   met = vMissingEnergy.Mod();
+//   metphi = vMissingEnergy.Phi();
+// }

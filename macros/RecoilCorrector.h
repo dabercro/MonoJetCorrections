@@ -72,8 +72,10 @@ public:
 
   // computations
   double GetError(double,RecoilType,UType,Parameter,ChannelNum) const;
-  void ComputeU(float genpt,float& u1,float& u2, float nsigma=0) const;
-  void CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met,float& metphi, float nsigma=0, float u1=-999, float u2=-999) const;
+  void ComputeU(float genpt, float& u1, float& u1ScUp, float& u1ScDown, float& u1ResUp, float& u1ResDown, 
+                float& u2, float& u2ResUp, float& u2ResDown) const;
+  /* void CorrectMET(float genpt,float genphi,float leppt,float lepphi,float& met, float& metScUp, float& metScDown, */
+  /*                 float& metResUp, float& metResDown, float& metphi, float u1=-999, float u2=-999) const; */
 
   void SetSingleGaus (bool single) { fSingleGaus = single; }
 
