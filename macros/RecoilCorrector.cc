@@ -234,11 +234,11 @@ void RecoilCorrector::ComputeU(float genpt,
     u1ResDown = mu;
   }
   else {
-    u1       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfcInverse(fabs(anotherUni));
-    u1ScUp   = u1 + muSig;
-    u1ScDown = u1 - muSig;
-    u1ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
-    u1ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    u1       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfInverse(fabs(anotherUni));
+    u1ScUp   = u1 - muSig;   // Recoil is negative, so subtract for higher MET
+    u1ScDown = u1 + muSig;
+    u1ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfInverse(fabs(anotherUni));
+    u1ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfInverse(fabs(anotherUni));
     if (fabs(u1ResDown) > fabs(u1ResUp)) {  // Swap them if toy on negative tail of Gaussian
       double temp = u1ResUp;
       u1ResUp = u1ResDown;
@@ -276,9 +276,9 @@ void RecoilCorrector::ComputeU(float genpt,
     u2ResDown = mu;
   }
   else {
-    u2       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfcInverse(fabs(anotherUni));
-    u2ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
-    u2ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfcInverse(fabs(anotherUni));
+    u2       = mu + anotherUni/fabs(anotherUni) * laSigma * TMath::ErfInverse(fabs(anotherUni));
+    u2ResUp   = mu + anotherUni/fabs(anotherUni) * (laSigma + laSigmaSig) * TMath::ErfInverse(fabs(anotherUni));
+    u2ResDown = mu + anotherUni/fabs(anotherUni) * (laSigma - laSigmaSig) * TMath::ErfInverse(fabs(anotherUni));
     if (fabs(u2ResDown) > fabs(u2ResUp)) {  // This will probably happen a lot less often
       double temp = u2ResUp;
       u2ResUp = u2ResDown;
